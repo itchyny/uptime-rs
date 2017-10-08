@@ -1,0 +1,21 @@
+[package]
+name = "uptime_lib"
+version = "0.0.0"
+authors = ["itchyny <itchyny@hatena.ne.jp>"]
+description = "Multi-platform uptime library"
+repository = "https://github.com/itchyny/uptime-rs"
+readme = "README.md"
+license = "MIT"
+
+[dependencies]
+time = "0.1"
+
+[target.'cfg(not(windows))'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+kernel32-sys = "0.2"
+
+[[bin]]
+name = "uptime-rs"
+path = "bin/main.rs"
