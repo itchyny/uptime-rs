@@ -2,18 +2,18 @@
 extern crate kernel32;
 #[cfg(not(windows))]
 extern crate libc;
-//extern crate time;
 
+use std::fmt::Write;
 #[cfg(not(windows))]
 use std::mem;
-use std::{fmt::Write, time::Duration};
+use std::time::Duration;
 
 #[cfg(target_os = "linux")]
 pub fn get() -> Result<Duration, String> {
     let mut info: libc::sysinfo = unsafe { mem::zeroed() };
     let ret = unsafe { libc::sysinfo(&mut info) };
     if ret == 0 {
-        Ok(Duration::from_millis(info.uptime as u64))
+        Ok(Duration::from_secs(info.uptime as u64))
     } else {
         Err("sysinfo failed".to_string())
     }
