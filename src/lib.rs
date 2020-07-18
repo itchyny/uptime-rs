@@ -2,9 +2,8 @@
 extern crate kernel32;
 #[cfg(not(windows))]
 extern crate libc;
-extern crate time;
 
-use time::Duration;
+use std::time::Duration;
 #[cfg(not(windows))]
 use std::mem;
 
@@ -13,7 +12,7 @@ pub fn get() -> Result<Duration, String> {
     let mut info: libc::sysinfo = unsafe { mem::zeroed() };
     let ret = unsafe { libc::sysinfo(&mut info) };
     if ret == 0 {
-        Ok(Duration::seconds(info.uptime as i64))
+        Ok(Duration::from_secs(info.uptime as u64))
     } else {
         Err("sysinfo failed".to_string())
     }
@@ -21,6 +20,7 @@ pub fn get() -> Result<Duration, String> {
 
 #[cfg(any(target_os = "macos", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
 pub fn get() -> Result<Duration, String> {
+    use std::time::SystemTime;
     let mut request = [libc::CTL_KERN, libc::KERN_BOOTTIME];
     let mut boottime: libc::timeval = unsafe { mem::zeroed() };
     let mut size: libc::size_t = mem::size_of_val(&boottime) as libc::size_t;
@@ -35,7 +35,9 @@ pub fn get() -> Result<Duration, String> {
         )
     };
     if ret == 0 {
-        Ok((time::now().to_timespec() - time::Timespec::new(boottime.tv_sec, boottime.tv_usec * 1000)))
+        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)
+            .map(|d| d - Duration::new(boottime.tv_sec as u64, boottime.tv_usec as u32 * 1000))
+            .map_err(|e| e.to_string())
     } else {
         Err("sysctl failed".to_string())
     }
@@ -44,5 +46,5 @@ pub fn get() -> Result<Duration, String> {
 #[cfg(target_os = "windows")]
 pub fn get() -> Result<Duration, String> {
     let ret: u64 = unsafe { kernel32::GetTickCount64() };
-    Ok(Duration::milliseconds(ret as i64))
+    Ok(Duration::from_millis(ret))
 }

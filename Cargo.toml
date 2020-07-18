@@ -7,9 +7,6 @@ repository = "https://github.com/itchyny/uptime-rs"
 readme = "README.md"
 license = "MIT"
 
-[dependencies]
-time = "0.1"
-
 [target.'cfg(not(windows))'.dependencies]
 libc = "0.2.72"
 
