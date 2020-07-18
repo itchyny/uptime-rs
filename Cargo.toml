@@ -11,10 +11,10 @@ license = "MIT"
 time = "0.1"
 
 [target.'cfg(not(windows))'.dependencies]
-libc = "0.2"
+libc = "0.2.72"
 
 [target.'cfg(windows)'.dependencies]
-kernel32-sys = "0.2"
+kernel32-sys = "0.2.2"
 
 [[bin]]
 name = "uptime-rs"
