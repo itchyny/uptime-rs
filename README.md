@@ -1,8 +1,4 @@
-# Multi-platform uptime library for Rust
-[![Travis Build Status](https://travis-ci.org/itchyny/uptime-rs.svg?branch=master)](https://travis-ci.org/itchyny/uptime-rs)
-[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/7osx5jdvs35j58hg?svg=true)](https://ci.appveyor.com/project/itchyny/uptime-rs)
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![crates.io](https://img.shields.io/crates/v/uptime_lib.svg)](https://crates.io/crates/uptime_lib)
+# Multi-platform uptime library for Rust [![CI Status](https://github.com/itchyny/uptime-rs/workflows/CI/badge.svg)](https://github.com/itchyny/uptime-rs/actions) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![crates.io](https://img.shields.io/crates/v/uptime_lib.svg)](https://crates.io/crates/uptime_lib)
 
 ## Example
 
