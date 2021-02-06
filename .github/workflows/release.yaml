@@ -21,7 +21,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@master
+      uses: actions/checkout@v2
     - name: Build
       run: cargo build
     - name: Install
@@ -47,7 +47,7 @@ jobs:
       env:
         TARGET: ${{ matrix.target }}
     - name: Upload artifact
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.target }}
         path: ${{ steps.asset.outputs.name }}.zip
@@ -58,7 +58,7 @@ jobs:
     steps:
     - name: Create release
       id: create-release
-      uses: actions/create-release@master
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -70,7 +70,7 @@ jobs:
       run: |
         echo '${{ steps.create-release.outputs.upload_url }}' > release_upload_url.txt
     - name: Upload release upload url
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v2
       with:
         name: create-release
         path: release_upload_url.txt
@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download release upload url
-      uses: actions/download-artifact@master
+      uses: actions/download-artifact@v2
       with:
         name: create-release
     - name: Set upload url
@@ -93,7 +93,7 @@ jobs:
       run: |
         echo "::set-output name=url::$(cat release_upload_url.txt)"
     - name: Download artifact
-      uses: actions/download-artifact@master
+      uses: actions/download-artifact@v2
       with:
         name: ${{ matrix.target }}
     - name: Set the executable name
@@ -103,7 +103,7 @@ jobs:
       id: asset
       run: echo "::set-output name=name::${{ steps.executable.outputs.name }}_${GITHUB_REF#refs/tags/}_${{ matrix.target }}_amd64"
     - name: Upload release artifact
-      uses: actions/upload-release-asset@master
+      uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
