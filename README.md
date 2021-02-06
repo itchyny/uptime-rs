@@ -1,4 +1,8 @@
-# Multi-platform uptime library for Rust [![CI Status](https://github.com/itchyny/uptime-rs/workflows/CI/badge.svg)](https://github.com/itchyny/uptime-rs/actions) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![crates.io](https://img.shields.io/crates/v/uptime_lib.svg)](https://crates.io/crates/uptime_lib)
+# Multi-platform uptime library for Rust
+[![CI Status](https://github.com/itchyny/uptime-rs/workflows/CI/badge.svg)](https://github.com/itchyny/uptime-rs/actions)
+[![crates.io](https://img.shields.io/crates/v/uptime_lib.svg)](https://crates.io/crates/uptime_lib)
+[![release](https://img.shields.io/github/release/itchyny/uptime-rs/all.svg)](https://github.com/itchyny/uptime-rs/releases)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/itchyny/uptime-rs/blob/master/LICENSE)
 
 ## Example
 
