@@ -3,9 +3,9 @@ extern crate kernel32;
 #[cfg(not(windows))]
 extern crate libc;
 
-use std::time::Duration;
 #[cfg(not(windows))]
 use std::mem;
+use std::time::Duration;
 
 #[cfg(target_os = "linux")]
 pub fn get() -> Result<Duration, String> {
@@ -18,7 +18,12 @@ pub fn get() -> Result<Duration, String> {
     }
 }
 
-#[cfg(any(target_os = "macos", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "freebsd",
+    target_os = "openbsd",
+    target_os = "netbsd"
+))]
 pub fn get() -> Result<Duration, String> {
     use std::time::SystemTime;
     let mut request = [libc::CTL_KERN, libc::KERN_BOOTTIME];
@@ -35,7 +40,8 @@ pub fn get() -> Result<Duration, String> {
         )
     };
     if ret == 0 {
-        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)
+        SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
             .map(|d| d - Duration::new(boottime.tv_sec as u64, boottime.tv_usec as u32 * 1000))
             .map_err(|e| e.to_string())
     } else {
