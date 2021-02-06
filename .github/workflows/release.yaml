@@ -25,7 +25,7 @@ jobs:
     - name: Build
       run: cargo build
     - name: Install
-      run: cargo install
+      run: cargo install --path .
     - name: Test
       run: cargo test
     - name: Run
