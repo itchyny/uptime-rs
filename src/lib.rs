@@ -1,7 +1,7 @@
-#[cfg(windows)]
-extern crate kernel32;
 #[cfg(not(windows))]
 extern crate libc;
+#[cfg(windows)]
+extern crate windows;
 
 #[cfg(not(windows))]
 use std::mem;
@@ -51,6 +51,6 @@ pub fn get() -> Result<Duration, String> {
 
 #[cfg(target_os = "windows")]
 pub fn get() -> Result<Duration, String> {
-    let ret: u64 = unsafe { kernel32::GetTickCount64() };
+    let ret: u64 = unsafe { windows::Win32::System::SystemInformation::GetTickCount64() };
     Ok(Duration::from_millis(ret))
 }
