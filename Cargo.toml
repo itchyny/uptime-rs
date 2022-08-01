@@ -8,7 +8,7 @@ readme = "README.md"
 license = "MIT"
 
 [target.'cfg(not(windows))'.dependencies]
-libc = "0.2.72"
+libc = "0.2.126"
 
 [target.'cfg(windows)'.dependencies.windows]
 version = "0.39.0"
