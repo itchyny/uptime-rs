@@ -1,7 +1,7 @@
 [package]
 name = "uptime_lib"
 version = "0.2.1"
-authors = ["itchyny <itchyny@hatena.ne.jp>"]
+authors = ["itchyny <itchyny@cybozu.co.jp>"]
 description = "Multi-platform uptime library"
 repository = "https://github.com/itchyny/uptime-rs"
 readme = "README.md"
