@@ -7,14 +7,40 @@ extern crate windows;
 use std::mem;
 use std::time::Duration;
 
+#[derive(Debug, thiserror::Error)]
+#[cfg_attr(target_os = "windows", allow(unused))]
+pub enum Error {
+    #[cfg(target_os = "linux")]
+    #[error("sysinfo failed")]
+    Sysinfo,
+
+    #[cfg(any(
+        target_os = "macos",
+        target_os = "freebsd",
+        target_os = "openbsd",
+        target_os = "netbsd"
+    ))]
+    #[error("sysctl failed")]
+    Sysctl,
+
+    #[cfg(any(
+        target_os = "macos",
+        target_os = "freebsd",
+        target_os = "openbsd",
+        target_os = "netbsd"
+    ))]
+    #[error(transparent)]
+    SystemTime(#[from] std::time::SystemTimeError),
+}
+
 #[cfg(target_os = "linux")]
-pub fn get() -> Result<Duration, String> {
+pub fn get() -> Result<Duration, Error> {
     let mut info: libc::sysinfo = unsafe { mem::zeroed() };
     let ret = unsafe { libc::sysinfo(&mut info) };
     if ret == 0 {
         Ok(Duration::from_secs(info.uptime as u64))
     } else {
-        Err("sysinfo failed".to_string())
+        Err(Error::Sysinfo)
     }
 }
 
@@ -24,7 +50,7 @@ pub fn get() -> Result<Duration, String> {
     target_os = "openbsd",
     target_os = "netbsd"
 ))]
-pub fn get() -> Result<Duration, String> {
+pub fn get() -> Result<Duration, Error> {
     use std::time::SystemTime;
     let mut request = [libc::CTL_KERN, libc::KERN_BOOTTIME];
     let mut boottime: libc::timeval = unsafe { mem::zeroed() };
@@ -40,17 +66,17 @@ pub fn get() -> Result<Duration, String> {
         )
     };
     if ret == 0 {
-        SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .map(|d| d - Duration::new(boottime.tv_sec as u64, boottime.tv_usec as u32 * 1000))
-            .map_err(|e| e.to_string())
+        Ok({
+            SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?
+                - Duration::new(boottime.tv_sec as u64, boottime.tv_usec as u32 * 1000)
+        })
     } else {
-        Err("sysctl failed".to_string())
+        Err(Error::Sysctl)
     }
 }
 
 #[cfg(target_os = "windows")]
-pub fn get() -> Result<Duration, String> {
+pub fn get() -> Result<Duration, Error> {
     let ret: u64 = unsafe { windows::Win32::System::SystemInformation::GetTickCount64() };
     Ok(Duration::from_millis(ret))
 }
