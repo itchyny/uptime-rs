@@ -11,14 +11,13 @@ categories = ["os"]
 edition = "2021"
 
 [dependencies]
-thiserror = "1"
+thiserror = "1.0.50"
 
 [target.'cfg(not(windows))'.dependencies]
-libc = "0.2.126"
+libc = "0.2.150"
 
-[target.'cfg(windows)'.dependencies.windows]
-version = "0.39.0"
-features = ["Win32_System_SystemInformation"]
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.52.0", features = ["Win32_System_SystemInformation"] }
 
 [[bin]]
 name = "uptime-rs"
