@@ -1,9 +1,4 @@
 #[cfg(not(windows))]
-extern crate libc;
-#[cfg(windows)]
-extern crate windows;
-
-#[cfg(not(windows))]
 use std::mem;
 use std::time::Duration;
 

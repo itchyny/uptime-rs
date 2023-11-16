@@ -6,6 +6,9 @@ description = "Multi-platform uptime library"
 repository = "https://github.com/itchyny/uptime-rs"
 readme = "README.md"
 license = "MIT"
+keywords = ["uptime"]
+categories = ["os"]
+edition = "2021"
 
 [dependencies]
 thiserror = "1"
