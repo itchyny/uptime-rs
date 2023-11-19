@@ -6,8 +6,10 @@ on:
     - main
   pull_request:
 
-jobs:
+permissions:
+  contents: read
 
+jobs:
   test:
     name: Test
     runs-on: ${{ matrix.os }}
@@ -16,11 +18,11 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Build
       run: cargo build
     - name: Install
-      run: cargo install --path .
+      run: cargo install --locked --path .
     - name: Test
       run: cargo test
     - name: Run

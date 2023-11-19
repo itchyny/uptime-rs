@@ -5,101 +5,82 @@ on:
     tags:
     - 'v*'
 
-jobs:
+permissions:
+  contents: write
 
+jobs:
   build:
     strategy:
       matrix:
-        target:
-        - linux
-        - darwin
-        include:
-        - target: linux
-          os: ubuntu-latest
-        - target: darwin
-          os: macos-latest
-    runs-on: ${{ matrix.os }}
+        job:
+        - target: x86_64-unknown-linux-gnu
+          os: linux
+          arch: amd64
+          runs-on: ubuntu-latest
+        - target: x86_64-apple-darwin
+          os: darwin
+          arch: amd64
+          runs-on: macos-latest
+        - target: x86_64-pc-windows-msvc
+          os: windows
+          arch: amd64
+          runs-on: windows-latest
+        - target: aarch64-unknown-linux-gnu
+          os: linux
+          arch: arm64
+          runs-on: ubuntu-latest
+        - target: aarch64-apple-darwin
+          os: darwin
+          arch: arm64
+          runs-on: macos-latest
+    runs-on: ${{ matrix.job.runs-on }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Build
-      run: cargo build
-    - name: Install
-      run: cargo install --path .
+      shell: bash
+      run: |
+        if [[ "${{ matrix.job.target }}" == aarch64-* ]]; then
+          rustup target add "${{ matrix.job.target }}"
+          if [[ "${{ matrix.job.os }}" == linux ]]; then
+            sudo apt-get install gcc-aarch64-linux-gnu
+            export RUSTFLAGS="-C linker=aarch64-linux-gnu-gcc"
+          fi
+        fi
+        cargo build --release --target=${{ matrix.job.target }}
     - name: Test
       run: cargo test
     - name: Run
       run: cargo run
     - name: Set the asset name
       id: asset
-      run: echo "::set-output name=name::${PWD##*/}_${GITHUB_REF#refs/tags/}_${{ matrix.target }}_amd64"
+      shell: bash
+      run: echo "name=${{ github.event.repository.name }}_${{ github.ref_name }}_${{ matrix.job.os }}_${{ matrix.job.arch }}" >> "$GITHUB_OUTPUT"
     - name: Build artifact
+      shell: bash
       run: |
-        export PATH=$PATH:~/.cache/cargo/bin
-        name=${{ steps.asset.outputs.name }}
-        mkdir $name
-        cp README.md LICENSE $name
-        mv "$(which "${PWD##*/}")" $name
-        zip -r $name.zip $name
-      env:
-        TARGET: ${{ matrix.target }}
+        mkdir "${{ steps.asset.outputs.name }}"
+        cp README.md LICENSE "${{ steps.asset.outputs.name }}"
+        mv "target/${{ matrix.job.target }}/release/${{ github.event.repository.name }}" "${{ steps.asset.outputs.name }}"
+        if [[ "${{ matrix.job.os }}" == windows ]]; then
+          powershell Compress-Archive -Path "${{ steps.asset.outputs.name }}" -DestinationPath "${{ steps.asset.outputs.name }}.zip"
+        else
+          zip -r "${{ steps.asset.outputs.name }}.zip" "${{ steps.asset.outputs.name }}"
+        fi
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.target }}
+        name: ${{ steps.asset.outputs.name }}
         path: ${{ steps.asset.outputs.name }}.zip
 
-  create-release:
+  release:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
     - name: Create release
-      id: create-release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: ncipollo/release-action@v1
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-    - name: Save release upload url
-      run: echo '${{ steps.create-release.outputs.upload_url }}' > release_upload_url.txt
-    - name: Upload release upload url
-      uses: actions/upload-artifact@v2
-      with:
-        name: create-release
-        path: release_upload_url.txt
-
-  upload-release:
-    strategy:
-      matrix:
-        target:
-        - linux
-        - darwin
-    needs: [create-release]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Download release upload url
-      uses: actions/download-artifact@v2
-      with:
-        name: create-release
-    - name: Set upload url
-      id: upload-url
-      run: echo "::set-output name=url::$(cat release_upload_url.txt)"
-    - name: Download artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: ${{ matrix.target }}
-    - name: Set the asset name
-      id: asset
-      run: echo "::set-output name=name::${PWD##*/}_${GITHUB_REF#refs/tags/}_${{ matrix.target }}_amd64"
-    - name: Upload release artifact
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.upload-url.outputs.url }}
-        asset_path: ${{ steps.asset.outputs.name }}.zip
-        asset_name: ${{ steps.asset.outputs.name }}.zip
-        asset_content_type: application/zip
+        name: Release ${{ github.ref_name }}
+        artifacts: '*/*.zip'
