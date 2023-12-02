@@ -17,7 +17,7 @@ test: build
 clean:
 	cargo clean
 
-VERSION := $$(sed -n '/^version =/{s/^.*  *"\([0-9][0-9.]*\)".*$$/\1/p;q;}' Cargo.toml)
+VERSION := $$(sed -n '/^version =/s/^.*  *"\([0-9][0-9.]*\)".*$$/\1/p' Cargo.toml)
 GIT_DIFF := $$(git diff --name-only)
 
 .PHONY: bump
