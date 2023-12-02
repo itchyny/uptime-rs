@@ -10,6 +10,11 @@ keywords = ["uptime"]
 categories = ["os"]
 edition = "2021"
 
+[profile.release]
+lto = true
+strip = true
+codegen-units = 1
+
 [dependencies]
 thiserror = "1.0.50"
 
