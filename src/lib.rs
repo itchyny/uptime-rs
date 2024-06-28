@@ -67,6 +67,8 @@ pub fn get() -> Result<Duration, Error> {
 }
 
 #[cfg(target_os = "windows")]
+// `Result` is needed to match the signature on other platforms
+#[allow(clippy::unnecessary_wraps)]
 pub fn get() -> Result<Duration, Error> {
     let ret: u64 = unsafe { windows::Win32::System::SystemInformation::GetTickCount64() };
     Ok(Duration::from_millis(ret))
