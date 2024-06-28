@@ -22,7 +22,7 @@ thiserror = "1.0.50"
 libc = "0.2.150"
 
 [target.'cfg(windows)'.dependencies]
-windows = { version = "0.52.0", features = ["Win32_System_SystemInformation"] }
+windows = { version = "0.57.0", features = ["Win32_System_SystemInformation"] }
 
 [[bin]]
 name = "uptime-rs"
