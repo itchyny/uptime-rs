@@ -1,28 +1,29 @@
 [package]
 name = "uptime_lib"
 version = "0.3.1"
-authors = ["itchyny <itchyny@cybozu.co.jp>"]
+edition = "2024"
 description = "Multi-platform uptime library"
 repository = "https://github.com/itchyny/uptime-rs"
-readme = "README.md"
+authors = ["itchyny <itchyny@cybozu.co.jp>"]
 license = "MIT"
+readme = "README.md"
 keywords = ["uptime"]
 categories = ["os"]
-edition = "2021"
 
 [profile.release]
+opt-level = "s"
 lto = true
 strip = true
 codegen-units = 1
 
 [dependencies]
-thiserror = "1.0.61"
+thiserror = "2.0.21"
 
 [target.'cfg(not(windows))'.dependencies]
-libc = "0.2.155"
+libc = "0.2.191"
 
 [target.'cfg(windows)'.dependencies]
-windows = { version = "0.57.0", features = ["Win32_System_SystemInformation"] }
+windows = { version = "0.62.2", features = ["Win32_System_SystemInformation"] }
 
 [[bin]]
 name = "uptime-rs"
