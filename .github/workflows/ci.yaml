@@ -105,3 +105,21 @@ jobs:
             --title "Release $GITHUB_REF_NAME" --notes "" artifacts/*
         env:
           GH_TOKEN: ${{ github.token }}
+
+  publish:
+    name: Publish
+    needs: release
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
+      - name: Authenticate with crates.io
+        id: auth
+        uses: rust-lang/crates-io-auth-action@v1.0.6
+      - name: Publish
+        run: cargo publish --locked
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
