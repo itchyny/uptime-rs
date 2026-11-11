@@ -59,8 +59,12 @@ pub fn get() -> Result<Duration, Error> {
         )
     };
     if ret == 0 {
-        Ok(SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?
-            - Duration::new(boottime.tv_sec as u64, boottime.tv_usec as u32 * 1000))
+        Ok(SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)?
+            .saturating_sub(Duration::new(
+                boottime.tv_sec as u64,
+                boottime.tv_usec as u32 * 1000,
+            )))
     } else {
         Err(Error::Sysctl)
     }
